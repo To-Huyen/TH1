@@ -37,10 +37,12 @@ def show_flat_shape_entries():
         widget.destroy()
 
     shape = flat_shape_var.get()
-    global flat_entry1, flat_entry2, flat_entry3
+    global flat_entry1, flat_entry2, flat_entry3,flat_entry4,flat_entry5
     flat_entry1 = tk.Entry(frame_flat_entries)
     flat_entry2 = tk.Entry(frame_flat_entries)
     flat_entry3 = tk.Entry(frame_flat_entries)
+    flat_entry4 = tk.Entry(frame_flat_entries)
+    flat_entry5 = tk.Entry(frame_flat_entries)
 
     if shape == "Hình tròn":
         tk.Label(frame_flat_entries, text="Bán kính:").pack()
@@ -67,11 +69,17 @@ def show_flat_shape_entries():
         flat_entry2.pack()
         tk.Label(frame_flat_entries, text="Chiều cao:").pack()
         flat_entry3.pack()
+        tk.Label(frame_flat_entries, text="Cạnh bên 1:").pack()
+        flat_entry4.pack()
+        tk.Label(frame_flat_entries, text="Cạnh bên 2:").pack()
+        flat_entry5.pack()
     elif shape == "Hình bình hành":
         tk.Label(frame_flat_entries, text="Cạnh đáy:").pack()
         flat_entry1.pack()
-        tk.Label(frame_flat_entries, text="Chiều cao:").pack()
+        tk.Label(frame_flat_entries, text="Cạnh bên:").pack()
         flat_entry2.pack()
+        tk.Label(frame_flat_entries, text="Chiều cao:").pack()
+        flat_entry3.pack()
 
 def validate_and_draw():
     shape = shape_var.get()
@@ -88,37 +96,78 @@ def calculate_flat_shape():
     shape = flat_shape_var.get()
     try:
         if shape == "Hình tròn":
-            radius = abs(float(flat_entry1.get()))
-            area = np.pi * radius ** 2
-            perimeter = 2 * np.pi * radius
-            messagebox.showinfo("Hình tròn", f"Diện tích: {area:.2f}, Chu vi: {perimeter:.2f}")
+            radius = (float(flat_entry1.get()))
+            if radius > 0:
+                area = np.pi * radius ** 2
+                perimeter = 2 * np.pi * radius
+                messagebox.showinfo("Hình tròn", f"Diện tích: {area:.2f}, Chu vi: {perimeter:.2f}")
+            else:
+                raise ValueError("Bán kính phải lớn hơn 0.")
+            
         elif shape == "Hình tam giác":
-            a, b, c = abs(float(flat_entry1.get())), abs(float(flat_entry2.get())), abs(float(flat_entry3.get()))
+            a, b, c = (float(flat_entry1.get())), (float(flat_entry2.get())), (float(flat_entry3.get()))
+            if any(side <= 0 for side in [a, b, c]):
+                raise ValueError("Các cạnh phải lớn hơn 0.")
             if a + b > c and a + c > b and b + c > a:
                 perimeter = a + b + c
                 s = perimeter / 2
                 area = np.sqrt(s * (s - a) * (s - b) * (s - c))
                 messagebox.showinfo("Hình tam giác", f"Diện tích: {area:.2f}, Chu vi: {perimeter:.2f}")
             else:
-                messagebox.showerror("Lỗi", "Ba cạnh không tạo thành tam giác.")
+                raise ValueError("Ba cạnh không hợp lệ để tạo thành tam giác.")
+            
         elif shape == "Hình vuông":
-            side = abs(float(flat_entry1.get()))
+            side = (float(flat_entry1.get()))    
+            if side <= 0:
+                raise ValueError("Cạnh phải lớn hơn 0.")
             area = side ** 2
             perimeter = 4 * side
             messagebox.showinfo("Hình vuông", f"Diện tích: {area:.2f}, Chu vi: {perimeter:.2f}")
+
         elif shape == "Hình chữ nhật":
-            length, width = abs(float(flat_entry1.get())), abs(float(flat_entry2.get()))
+            length, width = (float(flat_entry1.get())), (float(flat_entry2.get()))
+            if length <= 0 or width <= 0:
+                raise ValueError("Chiều dài và chiều rộng phải lớn hơn 0.")
+            if length <= width:
+                raise ValueError("Chiều dài phải lớn hơn chiều rộng.")
             area = length * width
             perimeter = 2 * (length + width)
             messagebox.showinfo("Hình chữ nhật", f"Diện tích: {area:.2f}, Chu vi: {perimeter:.2f}")
+
         elif shape == "Hình thang":
-            base1, base2, height = abs(float(flat_entry1.get())), abs(float(flat_entry2.get())), abs(float(flat_entry3.get()))
-            area = (base1 + base2) * height / 2
-            messagebox.showinfo("Hình thang", f"Diện tích: {area:.2f}")
+                base1 = (float(flat_entry1.get()))  # Đáy lớn
+                base2 = (float(flat_entry2.get()))  # Đáy nhỏ
+                height = (float(flat_entry3.get()))  # Chiều cao
+                side1 = (float(flat_entry4.get()))  # Cạnh bên 1
+                side2 = (float(flat_entry5.get()))  # Cạnh bên 2
+
+                if base1 <= 0 or base2 <= 0 or side1 <= 0 or side2 <= 0:
+                    messagebox.showerror("Lỗi", "Các cạnh phải lớn hơn 0.")
+                    return
+                if base1 <= base2:
+                    messagebox.showerror("Lỗi", "Đáy lớn phải lớn hơn đáy nhỏ.")
+                    return
+                perimeter = base1 + base2 + side1 + side2  # Chu vi
+                area = (base1 + base2) * height / 2       # Diện tích
+                messagebox.showinfo(
+                    "Hình thang",
+                    f"Diện tích: {area:.2f}, Chu vi: {perimeter:.2f}")
+                
         elif shape == "Hình bình hành":
-            base, height = abs(float(flat_entry1.get())), abs(float(flat_entry2.get()))
-            area = base * height
-            messagebox.showinfo("Hình bình hành", f"Diện tích: {area:.2f}")
+                base = (float(flat_entry1.get()))  # Cạnh đáy
+                side = (float(flat_entry2.get()))  # Cạnh bên
+                height = (float(flat_entry3.get()))  # Chiều cao
+                if base <= 0 or side <= 0:
+                    messagebox.showerror("Lỗi", "Cạnh đáy và cạnh bên phải lớn hơn 0.")
+                    return
+                if height <= 0:
+                    messagebox.showerror("Lỗi", "Chiều cao phải lớn hơn 0.")
+                    return
+                perimeter = 2 * (base + side)  # Chu vi
+                area = base * height           # Diện tích
+                messagebox.showinfo(
+                    "Hình bình hành",
+                    f"Diện tích: {area:.2f}, Chu vi: {perimeter:.2f}")
     except ValueError:
         messagebox.showerror("Lỗi", "Vui lòng nhập số hợp lệ.")
 
@@ -158,6 +207,73 @@ def draw_sphere(radius):
     z = radius * np.outer(np.ones_like(u), np.cos(v))
     ax.plot_surface(x, y, z, color="b", alpha=0.6)
     ax.set_title("Hình cầu")
+    plt.show()
+
+def draw_rectangular_prism(length, width, height):
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Các đỉnh của hình hộp chữ nhật
+    x = [0, length, length, 0, 0, length, length, 0]
+    y = [0, 0, width, width, 0, 0, width, width]
+    z = [0, 0, 0, 0, height, height, height, height]
+
+    # Các mặt
+    vertices = [
+        [0, 1, 5, 4],  # Mặt trước
+        [1, 2, 6, 5],  # Mặt phải
+        [2, 3, 7, 6],  # Mặt sau
+        [3, 0, 4, 7],  # Mặt trái
+        [0, 1, 2, 3],  # Mặt đáy
+        [4, 5, 6, 7]   # Mặt trên
+    ]
+
+    for v in vertices:
+        face = [[x[i], y[i], z[i]] for i in v]
+        ax.add_collection3d(Poly3DCollection([face], alpha=0.6, edgecolor='k', facecolor="blue"))
+
+    ax.set_xlim([0, length + 1])
+    ax.set_ylim([0, width + 1])
+    ax.set_zlim([0, height + 1])
+    ax.set_title("Hình hộp chữ nhật")
+    plt.show()
+
+def draw_pyramid(base_side, height):
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Tính tọa độ các đỉnh của hình chóp đều
+    half_side = base_side / 2
+    vertices = [
+        [0, 0, 0],  # Đỉnh A
+        [base_side, 0, 0],  # Đỉnh B
+        [base_side, base_side, 0],  # Đỉnh C
+        [0, base_side, 0],  # Đỉnh D
+        [half_side, half_side, height]  # Đỉnh S (đỉnh chóp)
+    ]
+
+    # Các mặt của hình chóp
+    faces = [
+        [vertices[0], vertices[1], vertices[4]],  # Mặt SAB
+        [vertices[1], vertices[2], vertices[4]],  # Mặt SBC
+        [vertices[2], vertices[3], vertices[4]],  # Mặt SCD
+        [vertices[3], vertices[0], vertices[4]],  # Mặt SDA
+        [vertices[0], vertices[1], vertices[2], vertices[3]]  # Đáy ABCD
+    ]
+
+    for face in faces:
+        ax.add_collection3d(Poly3DCollection([face], alpha=0.6, edgecolor='k', facecolor="orange"))
+
+    ax.set_xlim([-1, base_side + 1])
+    ax.set_ylim([-1, base_side + 1])
+    ax.set_zlim([-1, height + 1])
+    ax.set_title("Hình chóp đều")
     plt.show()
 
 def draw_cube(side):
