@@ -77,7 +77,10 @@ def predict_performance():
             float(entry_sleep_hours.get()),
             int(entry_sample_question_papers.get())
         ]
-
+        # Kiểm tra nếu có số âm
+        if any(value < 0 for value in inputs):
+            messagebox.showerror("Lỗi", "Vui lòng không nhập số âm!")
+            return
         # Chuẩn hóa dữ liệu đầu vào
         new_data = scaler.transform([inputs])
 
